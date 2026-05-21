@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rupesh LinkedIn Reply Agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f3ee;
+      --surface: #ffffff;
+      --border: #e0dbd0;
+      --border-strong: #c8c2b4;
+      --text: #1a1814;
+      --text-muted: #7a7468;
+      --accent: #1a1814;
+      --accent-fg: #f5f3ee;
+      --warning-bg: #fdf6e3;
+      --warning-border: #e8c84a;
+      --warning-text: #7a5c00;
+      --danger-bg: #fdf0f0;
+      --danger-border: #e8a0a0;
+      --danger-text: #8b2020;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .masthead {
+      margin-bottom: 2.5rem;
+    }
+
+    .masthead-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .masthead h1 {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    .masthead p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    .field { margin-bottom: 1rem; }
+
+    .field label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      padding: 14px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      resize: vertical;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    textarea:focus { border-color: var(--border-strong); }
+    textarea::placeholder { color: #b0aa9e; }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+
+    button.primary {
+      flex: 1;
+      padding: 12px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent-fg);
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button.primary:hover { opacity: 0.85; }
+    button.primary:active { transform: scale(0.99); }
+    button.primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    button.secondary {
+      padding: 12px 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    button.secondary:hover { border-color: var(--border-strong); color: var(--text); }
+
+    .status {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status.visible { display: flex; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 1.5px solid var(--border-strong);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box {
+      display: none;
+      margin-top: 1rem;
+      padding: 12px 16px;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: var(--radius);
+      font-size: 13px;
+      color: var(--danger-text);
+      line-height: 1.6;
+    }
+
+    .result { display: none; margin-top: 1.5rem; }
+
+    .flag-box {
+      display: none;
+      padding: 12px 16px;
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+    }
+
+    .flag-box .flag-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--warning-text);
+      margin-bottom: 4px;
+    }
+
+    .flag-box p {
+      font-size: 13px;
+      color: var(--warning-text);
+      line-height: 1.6;
+    }
+
+    .reply-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .reply-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .reply-header-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { border-color: var(--border-strong); color: var(--text); }
+    .copy-btn.copied { color: #2d7a3a; border-color: #a8d5ae; background: #f0faf1; }
+
+    .reply-body {
+      padding: 18px 16px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="masthead">
+      <div class="masthead-label">Ergode / Internal Tool</div>
+      <h1>LinkedIn Reply Agent</h1>
+      <p>Paste an incoming message. Get a reply in Rupesh's voice, ready to copy.</p>
+    </div>
+
+    <div class="field">
+      <label for="msgInput">Incoming message</label>
+      <textarea id="msgInput" placeholder="Paste the LinkedIn message or full DM thread here..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="primary" id="draftBtn" onclick="generateReply()">Draft reply</button>
+      <button class="secondary" onclick="clearAll()">Clear</button>
+    </div>
+
+    <div class="status" id="status">
+      <div class="spinner"></div>
+      <span>Drafting in Rupesh's voice...</span>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="result" id="result">
+      <div class="flag-box" id="flagBox">
+        <div class="flag-label">&#9888; Review before sending</div>
+        <p id="flagReason"></p>
+      </div>
+      <div class="reply-box">
+        <div class="reply-header">
+          <span class="reply-header-label">Draft reply</span>
+          <button class="copy-btn" id="copyBtn" onclick="copyReply()">Copy</button>
+        </div>
+        <div class="reply-body" id="replyBody"></div>
+      </div>
+    </div>
+
+    <div class="footer">Lawrence / Ergode Corp. Comms &mdash; Internal use only</div>
+  </div>
+
+  <script>
+    const PROXY = "https://rupesh-proxy-production.up.railway.app/draft";
+
+    async function generateReply() {
+      const msg = document.getElementById('msgInput').value.trim();
+      if (!msg) return;
+
+      const btn = document.getElementById('draftBtn');
+      const status = document.getElementById('status');
+      const errorBox = document.getElementById('errorBox');
+      const result = document.getElementById('result');
+      const flagBox = document.getElementById('flagBox');
+
+      btn.disabled = true;
+      status.classList.add('visible');
+      errorBox.style.display = 'none';
+      result.style.display = 'none';
+      flagBox.style.display = 'none';
+
+      try {
+        const res = await fetch(PROXY, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Server error " + res.status);
+        }
+
+        const data = await res.json();
+        document.getElementById('replyBody').textContent = data.reply || "";
+        result.style.display = 'block';
+
+        if (data.flag) {
+          document.getElementById('flagReason').textContent = data.flag;
+          flagBox.style.display = 'block';
+        }
+
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.textContent = 'Copy';
+        copyBtn.classList.remove('copied');
+
+      } catch(err) {
+        errorBox.textContent = "Error: " + err.message;
+        errorBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        status.classList.remove('visible');
+      }
+    }
+
+    function copyReply() {
+      const text = document.getElementById('replyBody').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function clearAll() {
+      document.getElementById('msgInput').value = '';
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('errorBox').style.display = 'none';
+      document.getElementById('flagBox').style.display = 'none';
+      document.getElementById('replyBody').textContent = '';
+    }
+
+    document.getElementById('msgInput').addEventListener('keydown', function(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateReply();
+    });
+  </script>
+</body>
+</html>
