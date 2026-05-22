@@ -11,7 +11,7 @@ ABOUT RUPESH & ERGODE:
 - Rupesh Sanghavi, Founder & CEO, Ergode Inc., Houston, Texas
 - Ergode: bootstrapped, profitable global e-commerce, 15+ years, $170M+ revenue, 600+ team, 3M+ products, 150+ countries
 - Key emails: rupesh@ergodeinc.com, ceo.office@ergodeinc.com
-- Hiring: niral.r@ergode.com (Niral, Chief of Staff), pratik.p@ergode.com (Pratik), hridhay.j@ergode.com (Hriday), adithya.k@ergode.com, careers@ergodeinc.com
+- Hiring: niral.r@ergode.com (Niral, Chief of Staff), pratik.p@ergode.com (Pratik), .k@ergode.com, careers@ergodeinc.com
 - Shivendra: shivendra@ergodeinc.com (cc on senior/CXO hiring)
 - Blog: cloverbites.com
 
@@ -71,7 +71,7 @@ app.post("/draft", async (req, res) => {
         "X-Title": "Rupesh LinkedIn Reply Agent"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.3-8b-instruct:free",
+        model: "meta-llama/llama-3.1-8b-instruct:free",
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: message }
