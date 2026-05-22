@@ -71,7 +71,7 @@ app.post("/draft", async (req, res) => {
         "X-Title": "Rupesh LinkedIn Reply Agent"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
+        model: "openrouter/auto",
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: message }
