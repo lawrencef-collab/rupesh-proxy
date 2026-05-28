@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rupesh LinkedIn Reply Agent</title>
+  <title>Ergode LinkedIn Reply Agent</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --bg: #f5f3ee;
       --surface: #ffffff;
@@ -17,16 +16,20 @@
       --text-muted: #7a7468;
       --accent: #1a1814;
       --accent-fg: #f5f3ee;
+      --tab-active: #1a1814;
+      --tab-inactive: #7a7468;
       --warning-bg: #fdf6e3;
       --warning-border: #e8c84a;
       --warning-text: #7a5c00;
       --danger-bg: #fdf0f0;
       --danger-border: #e8a0a0;
       --danger-text: #8b2020;
+      --success-bg: #f0faf1;
+      --success-border: #a8d5ae;
+      --success-text: #2d7a3a;
       --radius: 10px;
       --radius-lg: 14px;
     }
-
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -35,360 +38,472 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 3rem 1.5rem;
+      padding: 2.5rem 1.5rem;
     }
-
-    .page {
-      width: 100%;
-      max-width: 560px;
-    }
-
-    .masthead {
-      margin-bottom: 2.5rem;
-    }
-
+    .page { width: 100%; max-width: 580px; }
+    .masthead { margin-bottom: 1.75rem; }
     .masthead-label {
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .masthead h1 { font-size: 22px; font-weight: 500; color: var(--text); }
+
+    /* TABS */
+    .tabs {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+    }
+    .tab-btn {
+      flex: 1; padding: 10px 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none;
+      background: transparent;
+      color: var(--tab-inactive);
+      transition: all 0.15s;
+      border-right: 1px solid var(--border);
+    }
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--accent-fg);
+    }
+    .tab-btn:not(.active):hover { background: var(--bg); color: var(--text); }
+
+    .tab-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.05em; opacity: 0.7;
+      display: block; margin-top: 1px;
     }
 
-    .masthead h1 {
-      font-size: 22px;
-      font-weight: 500;
-      line-height: 1.3;
-      color: var(--text);
-    }
-
-    .masthead p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-top: 6px;
-      line-height: 1.6;
-    }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 2rem 0;
-    }
-
+    /* FIELDS */
     .field { margin-bottom: 1rem; }
-
     .field label {
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      display: block;
-      margin-bottom: 8px;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); display: block; margin-bottom: 7px;
     }
-
     textarea {
-      width: 100%;
-      height: 160px;
-      padding: 14px 16px;
+      width: 100%; padding: 13px 15px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      line-height: 1.65;
-      color: var(--text);
-      background: var(--surface);
+      font-size: 14px; line-height: 1.65;
+      color: var(--text); background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      resize: vertical;
+      resize: vertical; outline: none;
       transition: border-color 0.15s;
-      outline: none;
     }
-
     textarea:focus { border-color: var(--border-strong); }
     textarea::placeholder { color: #b0aa9e; }
+    #msgInput { height: 150px; }
+    #refineInput { height: 70px; }
 
     .btn-row { display: flex; gap: 10px; margin-top: 4px; }
-
     button.primary {
-      flex: 1;
-      padding: 12px 20px;
+      flex: 1; padding: 11px 20px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--accent-fg);
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+      font-size: 14px; font-weight: 500;
+      color: var(--accent-fg); background: var(--accent);
+      border: none; border-radius: var(--radius);
+      cursor: pointer; transition: opacity 0.15s;
     }
-
-    button.primary:hover { opacity: 0.85; }
-    button.primary:active { transform: scale(0.99); }
-    button.primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
+    button.primary:hover { opacity: 0.82; }
+    button.primary:disabled { opacity: 0.38; cursor: not-allowed; }
     button.secondary {
-      padding: 12px 16px;
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
-      white-space: nowrap;
+      padding: 11px 16px;
+      font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+      color: var(--text-muted); background: transparent;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
     }
-
     button.secondary:hover { border-color: var(--border-strong); color: var(--text); }
+    button.secondary:disabled { opacity: 0.38; cursor: not-allowed; }
 
     .status {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 12px;
-      display: none;
-      align-items: center;
-      gap: 8px;
+      font-family: 'DM Mono', monospace; font-size: 12px;
+      color: var(--text-muted); margin-top: 12px;
+      display: none; align-items: center; gap: 8px;
     }
-
     .status.visible { display: flex; }
-
     .spinner {
-      width: 14px; height: 14px;
+      width: 13px; height: 13px;
       border: 1.5px solid var(--border-strong);
       border-top-color: var(--text);
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
+      animation: spin 0.7s linear infinite; flex-shrink: 0;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .error-box {
-      display: none;
-      margin-top: 1rem;
-      padding: 12px 16px;
-      background: var(--danger-bg);
-      border: 1px solid var(--danger-border);
+      display: none; margin-top: 1rem;
+      padding: 11px 15px;
+      background: var(--danger-bg); border: 1px solid var(--danger-border);
       border-radius: var(--radius);
-      font-size: 13px;
-      color: var(--danger-text);
-      line-height: 1.6;
+      font-size: 13px; color: var(--danger-text); line-height: 1.6;
     }
 
+    /* RESULT AREA */
     .result { display: none; margin-top: 1.5rem; }
+    .result-divider {
+      border: none; border-top: 1px solid var(--border); margin-bottom: 1.25rem;
+    }
 
     .flag-box {
-      display: none;
-      padding: 12px 16px;
-      background: var(--warning-bg);
-      border: 1px solid var(--warning-border);
-      border-radius: var(--radius);
-      margin-bottom: 12px;
+      display: none; padding: 11px 15px;
+      background: var(--warning-bg); border: 1px solid var(--warning-border);
+      border-radius: var(--radius); margin-bottom: 12px;
     }
+    .flag-label {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--warning-text); margin-bottom: 3px;
+    }
+    .flag-box p { font-size: 13px; color: var(--warning-text); line-height: 1.6; }
 
-    .flag-box .flag-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--warning-text);
-      margin-bottom: 4px;
+    .reply-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 12px;
     }
-
-    .flag-box p {
-      font-size: 13px;
-      color: var(--warning-text);
-      line-height: 1.6;
-    }
-
-    .reply-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
+    .reply-card.redraft { border-color: var(--success-border); }
 
     .reply-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 15px; border-bottom: 1px solid var(--border);
       background: var(--bg);
     }
+    .redraft .reply-header { background: var(--success-bg); border-bottom-color: var(--success-border); }
 
     .reply-header-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
     }
+    .redraft .reply-header-label { color: var(--success-text); }
 
     .copy-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      transition: all 0.15s;
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.05em; color: var(--text-muted);
+      background: none; border: 1px solid var(--border);
+      border-radius: 6px; padding: 3px 10px; cursor: pointer; transition: all 0.15s;
     }
-
     .copy-btn:hover { border-color: var(--border-strong); color: var(--text); }
-    .copy-btn.copied { color: #2d7a3a; border-color: #a8d5ae; background: #f0faf1; }
+    .copy-btn.copied { color: var(--success-text); border-color: var(--success-border); background: var(--success-bg); }
 
     .reply-body {
-      padding: 18px 16px;
-      font-size: 14px;
-      line-height: 1.8;
-      color: var(--text);
-      white-space: pre-wrap;
-      max-height: 320px;
-      overflow-y: auto;
+      padding: 16px 15px; font-size: 14px; line-height: 1.8;
+      color: var(--text); white-space: pre-wrap;
+      max-height: 280px; overflow-y: auto;
+    }
+
+    /* REFINE SECTION */
+    .refine-section {
+      display: none; margin-top: 1rem;
+      padding: 14px 15px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+    }
+    .refine-section.visible { display: block; }
+    .refine-label {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 8px; display: block;
     }
 
     .footer {
-      margin-top: 3rem;
-      padding-top: 1.5rem;
+      margin-top: 2.5rem; padding-top: 1.25rem;
       border-top: 1px solid var(--border);
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--text-muted); letter-spacing: 0.05em;
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="masthead">
-      <div class="masthead-label">Ergode / Internal Tool</div>
-      <h1>LinkedIn Reply Agent</h1>
-      <p>Paste an incoming message. Get a reply in Rupesh's voice, ready to copy.</p>
-    </div>
-
-    <div class="field">
-      <label for="msgInput">Incoming message</label>
-      <textarea id="msgInput" placeholder="Paste the LinkedIn message or full DM thread here..."></textarea>
-    </div>
-
-    <div class="btn-row">
-      <button class="primary" id="draftBtn" onclick="generateReply()">Draft reply</button>
-      <button class="secondary" onclick="clearAll()">Clear</button>
-    </div>
-
-    <div class="status" id="status">
-      <div class="spinner"></div>
-      <span>Drafting in Rupesh's voice...</span>
-    </div>
-
-    <div class="error-box" id="errorBox"></div>
-
-    <div class="result" id="result">
-      <div class="flag-box" id="flagBox">
-        <div class="flag-label">&#9888; Review before sending</div>
-        <p id="flagReason"></p>
-      </div>
-      <div class="reply-box">
-        <div class="reply-header">
-          <span class="reply-header-label">Draft reply</span>
-          <button class="copy-btn" id="copyBtn" onclick="copyReply()">Copy</button>
-        </div>
-        <div class="reply-body" id="replyBody"></div>
-      </div>
-    </div>
-
-    <div class="footer">Lawrence / Ergode Corp. Comms &mdash; Internal use only</div>
+<div class="page">
+  <div class="masthead">
+    <div class="masthead-label">Ergode / Internal Tool</div>
+    <h1>LinkedIn Reply Agent</h1>
   </div>
 
-  <script>
-    const PROXY = "https://rupesh-proxy-production.up.railway.app/draft";
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('rupesh')">
+      Rupesh Sanghavi
+      <span class="tab-sub">Founder & CEO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('ergode')">
+      Ergode
+      <span class="tab-sub">Company Account</span>
+    </button>
+  </div>
 
-    async function generateReply() {
-      const msg = document.getElementById('msgInput').value.trim();
-      if (!msg) return;
+  <!-- INPUT -->
+  <div class="field">
+    <label for="msgInput">Incoming message</label>
+    <textarea id="msgInput" placeholder="Paste the LinkedIn message or full DM thread here..."></textarea>
+  </div>
 
-      const btn = document.getElementById('draftBtn');
-      const status = document.getElementById('status');
-      const errorBox = document.getElementById('errorBox');
-      const result = document.getElementById('result');
-      const flagBox = document.getElementById('flagBox');
+  <div class="btn-row">
+    <button class="primary" id="draftBtn" onclick="generateReply()">Draft reply</button>
+    <button class="secondary" onclick="clearAll()">Clear</button>
+  </div>
 
-      btn.disabled = true;
-      status.classList.add('visible');
-      errorBox.style.display = 'none';
-      result.style.display = 'none';
-      flagBox.style.display = 'none';
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span id="statusText">Drafting reply...</span>
+  </div>
+  <div class="error-box" id="errorBox"></div>
 
-      try {
-        const res = await fetch(PROXY, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: msg })
-        });
+  <!-- RESULT -->
+  <div class="result" id="result">
+    <hr class="result-divider">
 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Server error " + res.status);
-        }
+    <div class="flag-box" id="flagBox">
+      <div class="flag-label">&#9888; Review before sending</div>
+      <p id="flagReason"></p>
+    </div>
 
-        const data = await res.json();
-        document.getElementById('replyBody').textContent = data.reply || "";
-        result.style.display = 'block';
+    <div class="reply-card" id="originalCard">
+      <div class="reply-header">
+        <span class="reply-header-label">Draft reply</span>
+        <button class="copy-btn" onclick="copyText('originalBody', this)">Copy</button>
+      </div>
+      <div class="reply-body" id="originalBody"></div>
+    </div>
 
-        if (data.flag) {
-          document.getElementById('flagReason').textContent = data.flag;
-          flagBox.style.display = 'block';
-        }
+    <!-- REFINE -->
+    <div class="refine-section visible" id="refineSection">
+      <span class="refine-label">Refine this draft</span>
+      <textarea id="refineInput" placeholder="e.g. Make it warmer, add a line about routing to Niral, shorten it..."></textarea>
+      <div class="btn-row" style="margin-top: 10px;">
+        <button class="primary" id="redraftBtn" onclick="redraftReply()">Redraft</button>
+      </div>
+      <div class="status" id="refineStatus" style="margin-top:10px;">
+        <div class="spinner"></div>
+        <span>Redrafting...</span>
+      </div>
+    </div>
 
-        const copyBtn = document.getElementById('copyBtn');
-        copyBtn.textContent = 'Copy';
-        copyBtn.classList.remove('copied');
+    <!-- REDRAFT RESULT -->
+    <div class="reply-card redraft" id="redraftCard" style="display:none; margin-top:12px;">
+      <div class="reply-header">
+        <span class="reply-header-label">&#10003; Redrafted reply</span>
+        <button class="copy-btn" onclick="copyText('redraftBody', this)">Copy</button>
+      </div>
+      <div class="reply-body" id="redraftBody"></div>
+    </div>
+  </div>
 
-      } catch(err) {
-        errorBox.textContent = "Error: " + err.message;
-        errorBox.style.display = 'block';
-      } finally {
-        btn.disabled = false;
-        status.classList.remove('visible');
-      }
+  <div class="footer">Lawrence / Ergode Corp. Comms &mdash; Internal use only</div>
+</div>
+
+<script>
+const PROXY = "https://rupesh-proxy-production.up.railway.app/draft";
+let currentTab = 'rupesh';
+let currentDraft = '';
+
+const RUPESH_SYSTEM = `You are Lawrence, Sr. Manager Corp. Comms & Branding at Ergode. You ghostwrite LinkedIn replies for Rupesh Sanghavi, Founder & CEO of Ergode.
+
+ABOUT RUPESH & ERGODE:
+- Rupesh Sanghavi, Founder & CEO, Ergode Inc., Houston, Texas
+- Ergode: bootstrapped, profitable global e-commerce, 15+ years, $170M+ revenue, 600+ team, 3M+ products, 150+ countries
+- Key emails: rupesh@ergodeinc.com, ceo.office@ergodeinc.com
+- Hiring: niral.r@ergode.com (Niral, Chief of Staff), pratik.p@ergode.com (Pratik), hridhay.j@ergode.com (Hriday), adithya.k@ergode.com, careers@ergodeinc.com
+- Shivendra: shivendra@ergodeinc.com (cc on senior/CXO hiring)
+- Blog: cloverbites.com
+
+VOICE: Direct, experience-driven, no fluff. Thoughtful founder tone, not corporate. Warm but not over-familiar. Never sycophantic. Short sentences, clean prose.
+
+STRICT FORMATTING:
+- No em dashes (never, under any circumstances)
+- No bullet points
+- No bold text
+- Sign off every reply: Best, Rupesh
+
+RULES:
+- Calls are hard to fit in. Default to LinkedIn or email
+- Job inquiries: route to Niral (niral.r@ergode.com) and Pratik (pratik.p@ergode.com), cc careers@ergodeinc.com
+- Senior/CXO roles: also cc shivendra@ergodeinc.com
+- External consulting, marketing, tax, financial services: decline politely, cite internal focus
+- Scam messages (template placeholders, WhatsApp/Signal redirects, suspicious companies): decline briefly
+- Repeat pitchers: reference earlier declination, keep it very short
+- Leadership, AI, scaling conversations: engage with substance
+- Supplier/product inquiries: ask qualifying questions, route to Niral
+- Financial assistance: empathy, decline personally, encourage community support
+- Birthday/festival wishes: short warm reply
+- Harvard Club / high-value events: FLAG for Rupesh confirmation
+
+KNOWN CONTACTS:
+- Matthew Sherrard (Walt Labs, Houston, Ambika Sharma referral): agentic AI, lunch pending when Rupesh back from India
+- Prerna Makkar (ex-Amazon): Rupesh wrote her LinkedIn rec, resume already sent
+- Nadeem Azhar: sharp leadership/ops ongoing, engage with substance
+- Dr. Bob Wright MCC: executive coach, intellectual exchange on judgment at scale, no calls
+- Branson Packard (FoodFluence AI): asked for examples before committing
+- Anas Ahmad (S.S Product by Hobby Design, Moradabad): catalogs shared, routed to Niral
+- Bobby Umar (TEDx/LinkedIn trainer): declined referrals twice, keep closing
+- Garvit Chouhan: spoke on WhatsApp, asked to send details to email
+- Amit Trivedi: long-term contact, persistent, always redirect to TA team
+- Enrico Asta (Fusemachines/FUSE): Harvard Club NYC dinner June 9, pending Rupesh confirmation
+
+OUTPUT: Respond ONLY with a raw JSON object. No markdown, no backticks, no explanation. Two fields:
+- "reply": full reply text (plain text, no em dashes, no bullets, no bold)
+- "flag": null if no review needed, or a 1-2 sentence string explaining why Rupesh should personally review
+
+Example: {"reply":"Thanks for reaching out...\\n\\nBest, Rupesh","flag":null}`;
+
+const ERGODE_SYSTEM = `You are Lawrence, Sr. Manager Corp. Comms & Branding at Ergode. You ghostwrite LinkedIn replies for Ergode's company LinkedIn account.
+
+ABOUT ERGODE:
+- Ergode Inc., Houston, Texas
+- Bootstrapped, profitable global e-commerce company, 15+ years, $170M+ revenue, 600+ team, 3M+ products, 150+ countries
+- Founder & CEO: Rupesh Sanghavi
+- Key emails: ceo.office@ergodeinc.com, careers@ergodeinc.com
+- Hiring: niral.r@ergode.com (Niral, Chief of Staff), pratik.p@ergode.com (Pratik)
+
+VOICE: Professional but warm. Represents the company, not the individual. Clear, helpful, and grounded. Never salesy or overly corporate.
+
+STRICT FORMATTING:
+- No em dashes (never, under any circumstances)
+- No bullet points
+- No bold text
+- Sign off every reply: The Ergode Team
+
+RULES:
+- Partnership and business inquiries: acknowledge and route to ceo.office@ergodeinc.com
+- Job inquiries: route to niral.r@ergode.com and pratik.p@ergode.com, cc careers@ergodeinc.com
+- Supplier/product inquiries: ask qualifying questions, route to niral.r@ergode.com
+- External consulting, marketing, tax, financial services: decline politely
+- Scam or template messages: decline briefly
+- Positive comments about Ergode/products: acknowledge warmly, keep it short
+- Press or media inquiries: route to ceo.office@ergodeinc.com
+
+OUTPUT: Respond ONLY with a raw JSON object. No markdown, no backticks, no explanation. Two fields:
+- "reply": full reply text (plain text, no em dashes, no bullets, no bold)
+- "flag": null if no review needed, or a 1-2 sentence string explaining why the team should review before sending
+
+Example: {"reply":"Thank you for reaching out...\\n\\nThe Ergode Team","flag":null}`;
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && tab === 'rupesh') || (i === 1 && tab === 'ergode'));
+  });
+  clearAll();
+}
+
+async function generateReply() {
+  const msg = document.getElementById('msgInput').value.trim();
+  if (!msg) return;
+
+  const btn = document.getElementById('draftBtn');
+  const status = document.getElementById('status');
+  const errorBox = document.getElementById('errorBox');
+  const result = document.getElementById('result');
+  const flagBox = document.getElementById('flagBox');
+  const redraftCard = document.getElementById('redraftCard');
+
+  btn.disabled = true;
+  status.classList.add('visible');
+  errorBox.style.display = 'none';
+  result.style.display = 'none';
+  flagBox.style.display = 'none';
+  redraftCard.style.display = 'none';
+
+  const system = currentTab === 'rupesh' ? RUPESH_SYSTEM : ERGODE_SYSTEM;
+
+  try {
+    const data = await callProxy(system, msg);
+    currentDraft = data.reply || "";
+    document.getElementById('originalBody').textContent = currentDraft;
+    result.style.display = 'block';
+
+    if (data.flag) {
+      document.getElementById('flagReason').textContent = data.flag;
+      flagBox.style.display = 'block';
     }
+  } catch(err) {
+    errorBox.textContent = "Error: " + err.message;
+    errorBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    status.classList.remove('visible');
+  }
+}
 
-    function copyReply() {
-      const text = document.getElementById('replyBody').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copyBtn');
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    }
+async function redraftReply() {
+  const instruction = document.getElementById('refineInput').value.trim();
+  if (!instruction) return;
 
-    function clearAll() {
-      document.getElementById('msgInput').value = '';
-      document.getElementById('result').style.display = 'none';
-      document.getElementById('errorBox').style.display = 'none';
-      document.getElementById('flagBox').style.display = 'none';
-      document.getElementById('replyBody').textContent = '';
-    }
+  const btn = document.getElementById('redraftBtn');
+  const status = document.getElementById('refineStatus');
+  const redraftCard = document.getElementById('redraftCard');
 
-    document.getElementById('msgInput').addEventListener('keydown', function(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateReply();
-    });
-  </script>
+  btn.disabled = true;
+  status.classList.add('visible');
+  redraftCard.style.display = 'none';
+
+  const system = currentTab === 'rupesh' ? RUPESH_SYSTEM : ERGODE_SYSTEM;
+  const prompt = `Here is the original draft reply:\n\n${currentDraft}\n\nPlease redraft it with this instruction: ${instruction}\n\nKeep all the same rules and formatting. Return only the JSON object with the updated reply.`;
+
+  try {
+    const data = await callProxy(system, prompt);
+    document.getElementById('redraftBody').textContent = data.reply || "";
+    redraftCard.style.display = 'block';
+  } catch(err) {
+    document.getElementById('redraftBody').textContent = "Error: " + err.message;
+    redraftCard.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    status.classList.remove('visible');
+  }
+}
+
+async function callProxy(system, message) {
+  const res = await fetch(PROXY, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, system })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || "Server error " + res.status);
+  }
+  return await res.json();
+}
+
+function copyText(elementId, btn) {
+  const text = document.getElementById(elementId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function clearAll() {
+  document.getElementById('msgInput').value = '';
+  document.getElementById('refineInput').value = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('flagBox').style.display = 'none';
+  document.getElementById('redraftCard').style.display = 'none';
+  document.getElementById('originalBody').textContent = '';
+  document.getElementById('redraftBody').textContent = '';
+  currentDraft = '';
+}
+
+document.getElementById('msgInput').addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateReply();
+});
+</script>
 </body>
 </html>
