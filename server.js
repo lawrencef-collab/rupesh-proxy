@@ -10,20 +10,18 @@ app.post("/draft", async (req, res) => {
   if (!message) return res.status(400).json({ error: "No message provided" });
   if (!system) return res.status(400).json({ error: "No system prompt provided" });
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "API key not configured" });
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://lawrencef-collab.github.io/rupesh-proxy",
-        "X-Title": "Ergode LinkedIn Reply Agent"
+        "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "openrouter/auto",
+        model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: system },
           { role: "user", content: message }
