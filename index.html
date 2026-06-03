@@ -16,8 +16,6 @@
       --text-muted: #7a7468;
       --accent: #1a1814;
       --accent-fg: #f5f3ee;
-      --tab-active: #1a1814;
-      --tab-inactive: #7a7468;
       --warning-bg: #fdf6e3;
       --warning-border: #e8c84a;
       --warning-text: #7a5c00;
@@ -50,9 +48,8 @@
     }
     .masthead h1 { font-size: 22px; font-weight: 500; color: var(--text); }
 
-    /* TABS */
     .tabs {
-      display: flex; gap: 0;
+      display: flex;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
@@ -65,17 +62,13 @@
       font-size: 13px; font-weight: 500;
       cursor: pointer; border: none;
       background: transparent;
-      color: var(--tab-inactive);
+      color: var(--text-muted);
       transition: all 0.15s;
       border-right: 1px solid var(--border);
     }
     .tab-btn:last-child { border-right: none; }
-    .tab-btn.active {
-      background: var(--accent);
-      color: var(--accent-fg);
-    }
+    .tab-btn.active { background: var(--accent); color: var(--accent-fg); }
     .tab-btn:not(.active):hover { background: var(--bg); color: var(--text); }
-
     .tab-sub {
       font-family: 'DM Mono', monospace;
       font-size: 10px; font-weight: 400;
@@ -83,7 +76,6 @@
       display: block; margin-top: 1px;
     }
 
-    /* FIELDS */
     .field { margin-bottom: 1rem; }
     .field label {
       font-family: 'DM Mono', monospace;
@@ -104,7 +96,6 @@
     textarea:focus { border-color: var(--border-strong); }
     textarea::placeholder { color: #b0aa9e; }
     #msgInput { height: 150px; }
-    #refineInput { height: 70px; }
 
     .btn-row { display: flex; gap: 10px; margin-top: 4px; }
     button.primary {
@@ -150,11 +141,8 @@
       font-size: 13px; color: var(--danger-text); line-height: 1.6;
     }
 
-    /* RESULT AREA */
     .result { display: none; margin-top: 1.5rem; }
-    .result-divider {
-      border: none; border-top: 1px solid var(--border); margin-bottom: 1.25rem;
-    }
+    .result-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 1.25rem; }
 
     .flag-box {
       display: none; padding: 11px 15px;
@@ -202,19 +190,76 @@
       max-height: 280px; overflow-y: auto;
     }
 
-    /* REFINE SECTION */
+    /* REFINE CHAT */
     .refine-section {
       display: none; margin-top: 1rem;
-      padding: 14px 15px;
-      background: var(--surface); border: 1px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--surface);
     }
     .refine-section.visible { display: block; }
-    .refine-label {
-      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--text-muted); margin-bottom: 8px; display: block;
+
+    .refine-history {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 12px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
     }
+    .refine-history:empty { display: none; }
+
+    .refine-bubble {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 90%;
+    }
+    .refine-bubble.user {
+      background: var(--accent);
+      color: var(--accent-fg);
+      align-self: flex-end;
+      font-style: italic;
+    }
+    .refine-bubble.system {
+      background: var(--bg);
+      color: var(--text-muted);
+      align-self: flex-start;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+
+    .refine-input-row {
+      display: flex; gap: 0;
+    }
+    #refineInput {
+      flex: 1; border: none; border-radius: 0;
+      font-size: 13px; padding: 12px 14px;
+      resize: none; height: 48px; min-height: 48px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+    #refineInput:focus { outline: none; background: var(--surface); }
+    .refine-send-btn {
+      padding: 0 18px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      color: var(--accent-fg); background: var(--accent);
+      border: none; cursor: pointer; transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .refine-send-btn:hover { opacity: 0.82; }
+    .refine-send-btn:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    .refine-status {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      color: var(--text-muted); padding: 8px 15px;
+      display: none; align-items: center; gap: 6px;
+      border-top: 1px solid var(--border);
+    }
+    .refine-status.visible { display: flex; }
 
     .footer {
       margin-top: 2.5rem; padding-top: 1.25rem;
@@ -231,7 +276,6 @@
     <h1>LinkedIn Reply Agent</h1>
   </div>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('rupesh')">
       Rupesh Sanghavi
@@ -243,7 +287,6 @@
     </button>
   </div>
 
-  <!-- INPUT -->
   <div class="field">
     <label for="msgInput">Incoming message</label>
     <textarea id="msgInput" placeholder="Paste the LinkedIn message or full DM thread here..."></textarea>
@@ -256,11 +299,10 @@
 
   <div class="status" id="status">
     <div class="spinner"></div>
-    <span id="statusText">Drafting reply...</span>
+    <span>Drafting reply...</span>
   </div>
   <div class="error-box" id="errorBox"></div>
 
-  <!-- RESULT -->
   <div class="result" id="result">
     <hr class="result-divider">
 
@@ -277,26 +319,26 @@
       <div class="reply-body" id="originalBody"></div>
     </div>
 
-    <!-- REFINE -->
-    <div class="refine-section visible" id="refineSection">
-      <span class="refine-label">Refine this draft</span>
-      <textarea id="refineInput" placeholder="e.g. Make it warmer, add a line about routing to Niral, shorten it..."></textarea>
-      <div class="btn-row" style="margin-top: 10px;">
-        <button class="primary" id="redraftBtn" onclick="redraftReply()">Redraft</button>
-      </div>
-      <div class="status" id="refineStatus" style="margin-top:10px;">
-        <div class="spinner"></div>
-        <span>Redrafting...</span>
-      </div>
-    </div>
-
-    <!-- REDRAFT RESULT -->
-    <div class="reply-card redraft" id="redraftCard" style="display:none; margin-top:12px;">
+    <!-- REDRAFT CARD -->
+    <div class="reply-card redraft" id="redraftCard" style="display:none;">
       <div class="reply-header">
-        <span class="reply-header-label">&#10003; Redrafted reply</span>
+        <span class="reply-header-label">&#10003; Refined reply</span>
         <button class="copy-btn" onclick="copyText('redraftBody', this)">Copy</button>
       </div>
       <div class="reply-body" id="redraftBody"></div>
+    </div>
+
+    <!-- REFINE CHAT BOX -->
+    <div class="refine-section visible" id="refineSection">
+      <div class="refine-history" id="refineHistory"></div>
+      <div class="refine-input-row">
+        <textarea id="refineInput" placeholder="Refine this draft... e.g. make it warmer, add routing to Niral, shorten it"></textarea>
+        <button class="refine-send-btn" id="refineBtn" onclick="refineReply()">Refine</button>
+      </div>
+      <div class="refine-status" id="refineStatus">
+        <div class="spinner"></div>
+        <span>Refining...</span>
+      </div>
     </div>
   </div>
 
@@ -307,6 +349,7 @@
 const PROXY = "https://rupesh-proxy-production.up.railway.app/draft";
 let currentTab = 'rupesh';
 let currentDraft = '';
+let latestDraft = '';
 
 const RUPESH_SYSTEM = `You are Lawrence, Sr. Manager Corp. Comms & Branding at Ergode. You ghostwrite LinkedIn replies for Rupesh Sanghavi, Founder & CEO of Ergode.
 
@@ -331,7 +374,7 @@ RULES:
 - Job inquiries: route to Niral (niral.r@ergode.com) and Pratik (pratik.p@ergode.com), cc careers@ergodeinc.com
 - Senior/CXO roles: also cc shivendra@ergodeinc.com
 - External consulting, marketing, tax, financial services: decline politely, cite internal focus
-- Scam messages (template placeholders, WhatsApp/Signal redirects, suspicious companies): decline briefly
+- Scam messages: decline briefly
 - Repeat pitchers: reference earlier declination, keep it very short
 - Leadership, AI, scaling conversations: engage with substance
 - Supplier/product inquiries: ask qualifying questions, route to Niral
@@ -340,20 +383,20 @@ RULES:
 - Harvard Club / high-value events: FLAG for Rupesh confirmation
 
 KNOWN CONTACTS:
-- Matthew Sherrard (Walt Labs, Houston, Ambika Sharma referral): agentic AI, lunch pending when Rupesh back from India
+- Matthew Sherrard (Walt Labs, Houston, Ambika Sharma referral): agentic AI, lunch pending
 - Prerna Makkar (ex-Amazon): Rupesh wrote her LinkedIn rec, resume already sent
 - Nadeem Azhar: sharp leadership/ops ongoing, engage with substance
-- Dr. Bob Wright MCC: executive coach, intellectual exchange on judgment at scale, no calls
+- Dr. Bob Wright MCC: executive coach, no calls
 - Branson Packard (FoodFluence AI): asked for examples before committing
 - Anas Ahmad (S.S Product by Hobby Design, Moradabad): catalogs shared, routed to Niral
-- Bobby Umar (TEDx/LinkedIn trainer): declined referrals twice, keep closing
+- Bobby Umar (TEDx/LinkedIn trainer): declined referrals twice
 - Garvit Chouhan: spoke on WhatsApp, asked to send details to email
-- Amit Trivedi: long-term contact, persistent, always redirect to TA team
-- Enrico Asta (Fusemachines/FUSE): Harvard Club NYC dinner June 9, pending Rupesh confirmation
+- Amit Trivedi: long-term contact, always redirect to TA team
+- Enrico Asta (Fusemachines/FUSE): Harvard Club NYC dinner June 9, pending confirmation
 
 OUTPUT: Respond ONLY with a raw JSON object. No markdown, no backticks, no explanation. Two fields:
 - "reply": full reply text (plain text, no em dashes, no bullets, no bold)
-- "flag": null if no review needed, or a 1-2 sentence string explaining why Rupesh should personally review
+- "flag": null if no review needed, or a 1-2 sentence string explaining why Rupesh should review
 
 Example: {"reply":"Thanks for reaching out...\\n\\nBest, Rupesh","flag":null}`;
 
@@ -361,31 +404,31 @@ const ERGODE_SYSTEM = `You are Lawrence, Sr. Manager Corp. Comms & Branding at E
 
 ABOUT ERGODE:
 - Ergode Inc., Houston, Texas
-- Bootstrapped, profitable global e-commerce company, 15+ years, $170M+ revenue, 600+ team, 3M+ products, 150+ countries
+- Bootstrapped, profitable global e-commerce, 15+ years, $170M+ revenue, 600+ team, 3M+ products, 150+ countries
 - Founder & CEO: Rupesh Sanghavi
 - Key emails: ceo.office@ergodeinc.com, careers@ergodeinc.com
-- Hiring: niral.r@ergode.com (Niral, Chief of Staff), pratik.p@ergode.com (Pratik)
+- Hiring: niral.r@ergode.com (Niral), pratik.p@ergode.com (Pratik)
 
-VOICE: Professional but warm. Represents the company, not the individual. Clear, helpful, and grounded. Never salesy or overly corporate.
+VOICE: Professional but warm. Represents the company. Clear, helpful, grounded. Never salesy.
 
 STRICT FORMATTING:
-- No em dashes (never, under any circumstances)
+- No em dashes
 - No bullet points
 - No bold text
-- Sign off every reply: The Ergode Team
+- Sign off: The Ergode Team
 
 RULES:
-- Partnership and business inquiries: acknowledge and route to ceo.office@ergodeinc.com
+- Partnership/business inquiries: route to ceo.office@ergodeinc.com
 - Job inquiries: route to niral.r@ergode.com and pratik.p@ergode.com, cc careers@ergodeinc.com
-- Supplier/product inquiries: ask qualifying questions, route to niral.r@ergode.com
-- External consulting, marketing, tax, financial services: decline politely
-- Scam or template messages: decline briefly
-- Positive comments about Ergode/products: acknowledge warmly, keep it short
-- Press or media inquiries: route to ceo.office@ergodeinc.com
+- Supplier inquiries: ask qualifying questions, route to niral.r@ergode.com
+- External consulting/services: decline politely
+- Scam/template messages: decline briefly
+- Positive comments: acknowledge warmly, keep short
+- Press/media: route to ceo.office@ergodeinc.com
 
-OUTPUT: Respond ONLY with a raw JSON object. No markdown, no backticks, no explanation. Two fields:
-- "reply": full reply text (plain text, no em dashes, no bullets, no bold)
-- "flag": null if no review needed, or a 1-2 sentence string explaining why the team should review before sending
+OUTPUT: Respond ONLY with a raw JSON object. Two fields:
+- "reply": full reply text
+- "flag": null or reason to review
 
 Example: {"reply":"Thank you for reaching out...\\n\\nThe Ergode Team","flag":null}`;
 
@@ -414,12 +457,14 @@ async function generateReply() {
   result.style.display = 'none';
   flagBox.style.display = 'none';
   redraftCard.style.display = 'none';
+  document.getElementById('refineHistory').innerHTML = '';
 
   const system = currentTab === 'rupesh' ? RUPESH_SYSTEM : ERGODE_SYSTEM;
 
   try {
     const data = await callProxy(system, msg);
     currentDraft = data.reply || "";
+    latestDraft = currentDraft;
     document.getElementById('originalBody').textContent = currentDraft;
     result.style.display = 'block';
 
@@ -436,28 +481,55 @@ async function generateReply() {
   }
 }
 
-async function redraftReply() {
+async function refineReply() {
   const instruction = document.getElementById('refineInput').value.trim();
   if (!instruction) return;
 
-  const btn = document.getElementById('redraftBtn');
+  const btn = document.getElementById('refineBtn');
   const status = document.getElementById('refineStatus');
   const redraftCard = document.getElementById('redraftCard');
+  const history = document.getElementById('refineHistory');
 
   btn.disabled = true;
   status.classList.add('visible');
-  redraftCard.style.display = 'none';
+
+  // Add user instruction bubble
+  const userBubble = document.createElement('div');
+  userBubble.className = 'refine-bubble user';
+  userBubble.textContent = instruction;
+  history.appendChild(userBubble);
+  history.scrollTop = history.scrollHeight;
+
+  document.getElementById('refineInput').value = '';
 
   const system = currentTab === 'rupesh' ? RUPESH_SYSTEM : ERGODE_SYSTEM;
-  const prompt = `Here is the original draft reply:\n\n${currentDraft}\n\nPlease redraft it with this instruction: ${instruction}\n\nKeep all the same rules and formatting. Return only the JSON object with the updated reply.`;
+  const prompt = `INSTRUCTION FROM USER: "${instruction}"
+
+You must rewrite the reply below completely to follow this instruction. Ignore the previous tone or intent entirely if needed.
+
+Previous draft (DO NOT keep this - rewrite it from scratch):
+"${latestDraft}"
+
+Return only the JSON object with the fully rewritten reply.`;
 
   try {
     const data = await callProxy(system, prompt);
-    document.getElementById('redraftBody').textContent = data.reply || "";
+    latestDraft = data.reply || "";
+    document.getElementById('redraftBody').textContent = latestDraft;
     redraftCard.style.display = 'block';
+
+    // Add system confirmation bubble
+    const sysBubble = document.createElement('div');
+    sysBubble.className = 'refine-bubble system';
+    sysBubble.textContent = 'Done. Refined reply updated above.';
+    history.appendChild(sysBubble);
+    history.scrollTop = history.scrollHeight;
+
   } catch(err) {
-    document.getElementById('redraftBody').textContent = "Error: " + err.message;
-    redraftCard.style.display = 'block';
+    const sysBubble = document.createElement('div');
+    sysBubble.className = 'refine-bubble system';
+    sysBubble.textContent = 'Error: ' + err.message;
+    history.appendChild(sysBubble);
   } finally {
     btn.disabled = false;
     status.classList.remove('visible');
@@ -482,10 +554,7 @@ function copyText(elementId, btn) {
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Copied!';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'Copy';
-      btn.classList.remove('copied');
-    }, 2000);
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
   });
 }
 
@@ -498,11 +567,17 @@ function clearAll() {
   document.getElementById('redraftCard').style.display = 'none';
   document.getElementById('originalBody').textContent = '';
   document.getElementById('redraftBody').textContent = '';
+  document.getElementById('refineHistory').innerHTML = '';
   currentDraft = '';
+  latestDraft = '';
 }
 
 document.getElementById('msgInput').addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') generateReply();
+});
+
+document.getElementById('refineInput').addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') refineReply();
 });
 </script>
 </body>
