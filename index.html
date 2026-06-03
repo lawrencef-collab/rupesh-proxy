@@ -47,6 +47,14 @@
       color: var(--text-muted); margin-bottom: 6px;
     }
     .masthead h1 { font-size: 22px; font-weight: 500; color: var(--text); }
+    .masthead-row { display: flex; align-items: center; justify-content: space-between; }
+    .counter-badge {
+      font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+      color: var(--text-muted); background: var(--surface);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 4px 12px; letter-spacing: 0.05em; white-space: nowrap;
+    }
+    .counter-badge span { color: var(--text); font-weight: 500; }
 
     .tabs {
       display: flex;
@@ -273,7 +281,10 @@
 <div class="page">
   <div class="masthead">
     <div class="masthead-label">Ergode / Internal Tool</div>
-    <h1>LinkedIn Reply Agent</h1>
+    <div class="masthead-row">
+      <h1>LinkedIn Reply Agent</h1>
+      <div class="counter-badge">Today &nbsp;<span id="msgCounter">0</span> drafted</div>
+    </div>
   </div>
 
   <div class="tabs">
@@ -471,6 +482,7 @@ async function generateReply() {
     latestDraft = currentDraft;
     document.getElementById('originalBody').textContent = currentDraft;
     result.style.display = 'block';
+    incrementCounter();
 
     if (data.flag) {
       document.getElementById('flagReason').textContent = data.flag;
@@ -583,6 +595,26 @@ document.getElementById('msgInput').addEventListener('keydown', function(e) {
 document.getElementById('refineInput').addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') refineReply();
 });
+
+function getTodayKey() {
+  const d = new Date();
+  return 'msgCount_' + d.getFullYear() + '_' + (d.getMonth()+1) + '_' + d.getDate();
+}
+
+function incrementCounter() {
+  const key = getTodayKey();
+  const count = parseInt(localStorage.getItem(key) || '0') + 1;
+  localStorage.setItem(key, count);
+  document.getElementById('msgCounter').textContent = count;
+}
+
+function loadCounter() {
+  const key = getTodayKey();
+  const count = parseInt(localStorage.getItem(key) || '0');
+  document.getElementById('msgCounter').textContent = count;
+}
+
+loadCounter();
 </script>
 </body>
 </html>
